@@ -51,21 +51,23 @@ bad_drivers = function(df) {
     dplyr::select(Tag, State, ViolFine, Balance,
                   ViolDate, Description, NoticeDate)
   df = df %>%
-    filter(!is.na(Tag), !is.na(State)) %>%
-    filter(!Tag %in% c("NOTAGS T", "NO TAGST", "NOTAGSDI"))
+    dplyr::filter(!is.na(Tag), !is.na(State)) %>%
+    dplyr::filter(!Tag %in% c("NOTAGS T", "NO TAGST", "NOTAGSDI"))
   stopifnot(!anyNA(df$ViolFine))
   stopifnot(!anyNA(df$ViolDate))
   stopifnot(!anyNA(df$Balance))
   first_date = lubridate::as_date("1970-01-01")
   n_missing_date = sum(df$ViolDate <= first_date)
   df = df %>%
-    mutate(ViolDate = if_else(ViolDate == first_date,
-                              NoticeDate,
-                              ViolDate))
+    dplyr::mutate(
+      ViolDate = dplyr::if_else(
+        ViolDate == first_date,
+        NoticeDate,
+        ViolDate))
   n_missing_date2 = sum(df$ViolDate <= first_date)
   high_tags = df %>%
-    group_by(Tag, State) %>%
-    summarise(n = n(),
+    dplyr::group_by(Tag, State) %>%
+    dplyr::summarise(n = dplyr::n(),
               total_fine = sum(ViolFine),
               total_balance = sum(Balance),
               latest_violation_date = max(ViolDate),
@@ -73,7 +75,7 @@ bad_drivers = function(df) {
   # high_tags = high_tags %>%
   #   arrange(desc(n))
   high_tags = high_tags %>%
-    arrange(desc(total_balance))
+    dplyr::arrange(dplyr::desc(total_balance))
 }
 
 
@@ -117,7 +119,7 @@ updated_fines = function(
   # see
   # https://developers.arcgis.com/rest/services-reference/enterprise/query-feature-service-layer-.htm
   # library(tmap)
-  url <- parse_url(
+  url <- httr::parse_url(
     paste0("https://opendata.baltimorecity.gov/",
            "egis/rest/services/NonSpatialTables/",
            "ParkingFines/FeatureServer/0/query")
@@ -136,7 +138,7 @@ updated_fines = function(
                     # f = "geojson"
                     f = "json"
   )
-  url = build_url(url)
+  url = httr::build_url(url)
   # url = paste0(url, "&outFields=*")
   # url = paste0(
   # "https://opendata.baltimorecity.gov/egis/rest/services",
@@ -154,7 +156,7 @@ updated_fines = function(
   # url = works_url
   # count = "returnCountOnly=true"
   # URLdecode(works_url)
-  URLdecode(url)
+  utils::URLdecode(url)
   count = httr::GET(paste0(url, "&returnCountOnly=true"),
                     httr::content_type_json())
   count = flatten_content(count)$count
@@ -187,7 +189,7 @@ prop_info = function() {
     f = "json"
   )
   url = httr::build_url(url)
-  URLdecode(url)
+  utils::URLdecode(url)
   count = httr::GET(paste0(url, "&returnCountOnly=true"),
                     httr::content_type_json())
   count = flatten_content(count)$count

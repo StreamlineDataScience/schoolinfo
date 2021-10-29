@@ -23,11 +23,11 @@ motor_data = function() {
   }
   df = read_motor_table(destfile, sheet)
   df = df %>%
-    mutate(
+    dplyr::mutate(
       month = factor(month, levels = month.name),
       month_num = as.numeric(month),
       year_fac = factor(year),
-      modern = case_when(
+      modern = dplyr::case_when(
         year >= 2019 ~ ">= 2019",
         TRUE ~ "< 2019")
     )

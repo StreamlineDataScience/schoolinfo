@@ -65,13 +65,13 @@ clean_agency = function(...) {
   L = agency_default_rates(...)
   lenders = L$lenders
   info = lenders %>%
-    select(LID, Name, Address, City,
+    dplyr::select(LID, Name, Address, City,
            State, `Zip Code`, `Zip Ext`) %>%
     dplyr::distinct()
 
   ga = L$guarantors
   info = ga %>%
-    select(`GA Code`, Name, Address, City,
+    dplyr::select(`GA Code`, Name, Address, City,
            State, `Zip Code`, `Zip Ext`) %>%
     dplyr::distinct()
 
